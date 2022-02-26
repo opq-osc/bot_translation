@@ -73,9 +73,9 @@ async def main(ctx: Union[GroupMsg, FriendMsg]):
         api_res = await translate(rawtext)
     if "error_code" in api_res.keys():
         logger.error(f"翻译错误:{api_res}")
-        S.text(text="error")
+        await S.atext(text="error")
         return
-    S.text(text=return_msg(api_res))
+    await S.atext(text=return_msg(api_res))
 
 
 async def receive_group_msg(ctx):
