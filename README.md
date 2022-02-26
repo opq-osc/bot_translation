@@ -1,0 +1,2 @@
+# bot_translation
+botoyd
