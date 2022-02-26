@@ -5,8 +5,10 @@ from pathlib import Path
 from typing import Union
 
 import httpx
-from botoy import GroupMsg, FriendMsg, logger, S
+from botoy import FriendMsg, GroupMsg, S
 from botoy import async_decorators as deco
+from botoy import logger
+from botoy.contrib import plugin_receiver
 
 __doc__ = """翻译插件"""
 
@@ -20,14 +22,16 @@ except:
     exit(0)
 
 appid = config["appid"]  # appid
-secretKey = config['secretKey']  # 密钥
-defaultToLang = config['defaultToLang']  # 密钥
+secretKey = config["secretKey"]  # 密钥
+defaultToLang = config["defaultToLang"]  # 密钥
 if appid == "" or secretKey == "":
     logger.error("请检查百度翻译appid和secretKey")
     exit(0)
 
 
-async def translate(text: str, fromLang: str = "auto", toLang: str = defaultToLang) -> dict:
+async def translate(
+    text: str, fromLang: str = "auto", toLang: str = defaultToLang
+) -> dict:
     """
     翻译
     :rtype: dict
@@ -36,6 +40,7 @@ async def translate(text: str, fromLang: str = "auto", toLang: str = defaultToLa
     :param toLang: 翻译目标语言 (不可auto)
     :return:
     """
+    print("running")
     url = "https://api.fanyi.baidu.com/api/trans/vip/translate"
     salt = str(random.randint(32768, 65536))
     params = {
@@ -44,7 +49,7 @@ async def translate(text: str, fromLang: str = "auto", toLang: str = defaultToLa
         "from": fromLang,
         "to": toLang,
         "salt": salt,
-        "sign": hashlib.md5(str(appid + text + salt + secretKey).encode()).hexdigest()
+        "sign": hashlib.md5(str(appid + text + salt + secretKey).encode()).hexdigest(),
     }
     async with httpx.AsyncClient() as client:
         res = await client.get(url, params=params)
@@ -61,12 +66,14 @@ def return_msg(res: dict) -> str:
 keyword = "翻译"
 
 
+@plugin_receiver.friend
+@plugin_receiver.group
 @deco.ignore_botself
 @deco.startswith(keyword)
 async def main(ctx: Union[GroupMsg, FriendMsg]):
-    msg = ctx.Content[len(keyword) - 1:]
+    msg = ctx.Content[len(keyword) - 1 :]
     cmd, rawtext = msg.split(" ", 1)
-    if '.' in cmd:
+    if "." in cmd:
         toLang = cmd.split(".", 1)[1]
         api_res = await translate(rawtext, toLang=toLang)
     else:
@@ -76,11 +83,3 @@ async def main(ctx: Union[GroupMsg, FriendMsg]):
         await S.atext(text="error")
         return
     await S.atext(text=return_msg(api_res))
-
-
-async def receive_group_msg(ctx):
-    await main(ctx)
-
-
-async def receive_friend_msg(ctx):
-    await main(ctx)
