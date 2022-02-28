@@ -2,13 +2,19 @@
 
 ### 安装:
 
-**需要注册登录百度翻译开放平台获取APPID和密钥,并填进config.json**
+botoy 版本：`botoy >= 8.0.0`
 
-然后直接在botoy的plugins里clone这个仓库
+**注册登录百度翻译开放平台获取 APPID 和 SecretKey, 并在 botoy.json 中配置以下内容**
 
-启动botoy和OPQBot
+```json
+{
+  "translation.appid": "",
+  "translation.secretKey": "",
+  "translation.defaultToLang": "zh"
+}
+```
 
-
+然后直接在 botoy 的 plugins 里 clone 这个仓库
 
 [支持翻译的语种可以在这里查看](https://fanyi-api.baidu.com/doc/21)
 

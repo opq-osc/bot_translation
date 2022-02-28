@@ -1,32 +1,22 @@
 import hashlib
-import json
 import random
-from pathlib import Path
 from typing import Union
 
 import httpx
 from botoy import FriendMsg, GroupMsg, S
 from botoy import async_decorators as deco
-from botoy import logger
+from botoy import jconfig, logger
 from botoy.contrib import plugin_receiver
 
 __doc__ = """翻译插件"""
 
-curFileDir = Path(__file__).parent  # 当前文件路径
 
-try:
-    with open(curFileDir / "config.json", "r", encoding="utf-8") as f:
-        config = json.load(f)
-except:
-    logger.error("载入百度翻译配置文件出错")
-    exit(0)
+translation = jconfig.get_configuration('translation')
+appid = translation.get('appid')
+secretKey = translation.get('secretkey')
+defaultToLang = translation.get("defaultToLang", "zh")
 
-appid = config["appid"]  # appid
-secretKey = config["secretKey"]  # 密钥
-defaultToLang = config["defaultToLang"]  # 密钥
-if appid == "" or secretKey == "":
-    logger.error("请检查百度翻译appid和secretKey")
-    exit(0)
+assert appid and secretKey, "请配置appid和secretKey"
 
 
 async def translate(
@@ -40,7 +30,6 @@ async def translate(
     :param toLang: 翻译目标语言 (不可auto)
     :return:
     """
-    print("running")
     url = "https://api.fanyi.baidu.com/api/trans/vip/translate"
     salt = str(random.randint(32768, 65536))
     params = {
