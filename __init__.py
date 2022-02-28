@@ -13,7 +13,7 @@ __doc__ = """翻译插件"""
 
 translation = jconfig.get_configuration('translation')
 appid = translation.get('appid')
-secretKey = translation.get('secretkey')
+secretKey = translation.get('secretKey')
 defaultToLang = translation.get("defaultToLang", "zh")
 
 assert appid and secretKey, "请配置appid和secretKey"
